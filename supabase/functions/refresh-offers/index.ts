@@ -31,7 +31,7 @@ const destinationImages: Record<string, string> = {
   Paris: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80",
   "Nova York": "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80",
   "Buenos Aires": "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=800&q=80",
-  Santiago: "https://images.unsplash.com/photo-1595397551216-9f60034a2d68?w=800&q=80",
+  Santiago: "https://images.unsplash.com/photo-1689850543263-01a52ccc6943?w=800&q=80",
   Cancún: "https://images.unsplash.com/photo-1552074284-5e88ef1aef18?w=800&q=80",
   Madri: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800&q=80",
   Londres: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80",
