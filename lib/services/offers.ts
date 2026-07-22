@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { mockOffers } from "@/data/mock-offers";
+import { resolveFunctionError } from "@/lib/utils/supabase-error";
 import type { CabinClass, FlightOffer, OfferQuality } from "@/types";
 
 type OfferRow = {
@@ -108,7 +109,7 @@ export async function createOffer(input: AdminOfferInput, adminSecret: string) {
     headers: { "x-admin-secret": adminSecret },
     body: toRow(input),
   });
-  if (error) throw error;
+  if (error) throw await resolveFunctionError(error);
   return mapRowToOffer(data.offer as OfferRow);
 }
 
@@ -119,7 +120,7 @@ export async function updateOffer(id: string, input: AdminOfferInput, adminSecre
     headers: { "x-admin-secret": adminSecret },
     body: { id, ...toRow(input) },
   });
-  if (error) throw error;
+  if (error) throw await resolveFunctionError(error);
   return mapRowToOffer(data.offer as OfferRow);
 }
 
@@ -130,5 +131,5 @@ export async function deleteOffer(id: string, adminSecret: string) {
     headers: { "x-admin-secret": adminSecret },
     body: { id },
   });
-  if (error) throw error;
+  if (error) throw await resolveFunctionError(error);
 }

@@ -1,23 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
+import { resolveFunctionError } from "@/lib/utils/supabase-error";
 import type { Subscription } from "@/types";
-
-// supabase-js não repassa o corpo da resposta de erro das Edge Functions em
-// error.message (só um texto genérico tipo "non-2xx status code") — o corpo
-// real vem em error.context, que é o Response cru.
-async function resolveFunctionError(error: unknown): Promise<Error> {
-  if (error && typeof error === "object" && "context" in error) {
-    const context = (error as { context?: Response }).context;
-    if (context instanceof Response) {
-      try {
-        const body = await context.clone().json();
-        if (body?.error) return new Error(body.error as string);
-      } catch {
-        // corpo não era JSON, cai no fallback abaixo
-      }
-    }
-  }
-  return error instanceof Error ? error : new Error("Erro desconhecido");
-}
 
 type SubscriptionRow = {
   plan: Subscription["plan"];

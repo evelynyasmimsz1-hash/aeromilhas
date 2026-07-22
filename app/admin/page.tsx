@@ -67,8 +67,8 @@ function AdminDashboard({ secret, onLogout }: { secret: string; onLogout: () => 
       await createOffer(values, secret);
       closeForm();
       await loadOffers();
-    } catch {
-      setErrorMessage("Senha incorreta ou erro ao salvar. Verifique e tente de novo.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Erro ao salvar. Tente de novo.");
     }
   }
 
@@ -79,8 +79,8 @@ function AdminDashboard({ secret, onLogout }: { secret: string; onLogout: () => 
       await updateOffer(editingOffer.id, values, secret);
       setEditingOffer(null);
       await loadOffers();
-    } catch {
-      setErrorMessage("Senha incorreta ou erro ao salvar. Verifique e tente de novo.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Erro ao salvar. Tente de novo.");
     }
   }
 
@@ -91,8 +91,8 @@ function AdminDashboard({ secret, onLogout }: { secret: string; onLogout: () => 
       await deleteOffer(deletingOffer.id, secret);
       setDeletingOffer(null);
       await loadOffers();
-    } catch {
-      setErrorMessage("Senha incorreta ou erro ao excluir.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Erro ao excluir. Tente de novo.");
     }
   }
 
