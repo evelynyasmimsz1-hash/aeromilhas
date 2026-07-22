@@ -12,6 +12,10 @@ const adminSecret = Deno.env.get("ADMIN_SECRET")!;
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-secret",
+  // PATCH e DELETE não são métodos "seguros" pra CORS — sem declarar aqui,
+  // o navegador bloqueia o preflight e a chamada nunca chega a sair (isso
+  // não afeta POST, por isso só editar/excluir estava falhando).
+  "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
 };
 
 Deno.serve(async (request) => {
