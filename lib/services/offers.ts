@@ -132,18 +132,3 @@ export async function deleteOffer(id: string, adminSecret: string) {
   });
   if (error) throw error;
 }
-
-/** Manda um texto livre pra IA organizar em uma lista de ofertas estruturadas. */
-export async function parseOfferText(text: string, adminSecret: string): Promise<AdminOfferInput[]> {
-  const client = requireSupabase();
-  const { data, error } = await client.functions.invoke("parse-offer-text", {
-    method: "POST",
-    headers: { "x-admin-secret": adminSecret },
-    body: { text },
-  });
-  if (error) throw error;
-  return (data.offers as (AdminOfferInput & { departureDate: string | null })[]).map((offer) => ({
-    ...offer,
-    departureDate: offer.departureDate ?? undefined,
-  }));
-}

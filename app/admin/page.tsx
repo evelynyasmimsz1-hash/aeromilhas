@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { getOffers, createOffer, updateOffer, deleteOffer, type AdminOfferInput } from "@/lib/services/offers";
 import { formatCurrency, formatMiles, formatRoute } from "@/lib/utils/format";
+import type { AdminOfferInputForm } from "@/lib/validation/admin-offer";
 import type { FlightOffer } from "@/types";
 
 export default function AdminPage() {
@@ -30,9 +31,21 @@ function AdminDashboard({ secret, onLogout }: { secret: string; onLogout: () => 
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [pasteOpen, setPasteOpen] = useState(false);
+  const [prefillValues, setPrefillValues] = useState<Partial<AdminOfferInputForm> | null>(null);
   const [editingOffer, setEditingOffer] = useState<FlightOffer | null>(null);
   const [deletingOffer, setDeletingOffer] = useState<FlightOffer | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  function handleParsed(guess: Partial<AdminOfferInputForm>) {
+    setPasteOpen(false);
+    setPrefillValues(guess);
+    setFormOpen(true);
+  }
+
+  function closeForm() {
+    setFormOpen(false);
+    setPrefillValues(null);
+  }
 
   async function loadOffers() {
     setLoading(true);
@@ -52,7 +65,7 @@ function AdminDashboard({ secret, onLogout }: { secret: string; onLogout: () => 
     try {
       setErrorMessage(null);
       await createOffer(values, secret);
-      setFormOpen(false);
+      closeForm();
       await loadOffers();
     } catch {
       setErrorMessage("Senha incorreta ou erro ao salvar. Verifique e tente de novo.");
@@ -168,16 +181,11 @@ function AdminDashboard({ secret, onLogout }: { secret: string; onLogout: () => 
         </div>
       )}
 
-      <Modal open={formOpen} title="Nova oferta" onClose={() => setFormOpen(false)}>
-        <OfferForm onSubmit={handleCreate} submitLabel="Criar oferta" />
+      <Modal open={formOpen} title="Nova oferta" onClose={closeForm}>
+        <OfferForm defaultValues={prefillValues ?? undefined} onSubmit={handleCreate} submitLabel="Criar oferta" />
       </Modal>
 
-      <PasteTextModal
-        open={pasteOpen}
-        onClose={() => setPasteOpen(false)}
-        secret={secret}
-        onSaved={loadOffers}
-      />
+      <PasteTextModal open={pasteOpen} onClose={() => setPasteOpen(false)} onParsed={handleParsed} />
 
       {editingOffer && (
         <Modal open title="Editar oferta" onClose={() => setEditingOffer(null)}>
