@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { Logo } from "@/components/shared/Logo";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { supabase } from "@/lib/supabase/client";
 
 const STORAGE_KEY = "aeromilhas-admin-secret";
 
@@ -39,9 +40,28 @@ export function AdminGate({
   onSubmit: (value: string) => void;
   children: ReactNode;
 }) {
-  const [value, setValue] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (secret) return <>{children}</>;
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!supabase) return;
+    setError(null);
+    setVerifying(true);
+    const { data, error: invokeError } = await supabase.functions.invoke("admin-login", {
+      body: { email, password },
+    });
+    setVerifying(false);
+    if (invokeError || !data?.success) {
+      setError("E-mail ou senha inválidos.");
+      return;
+    }
+    onSubmit(password);
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-bg px-4">
@@ -50,21 +70,28 @@ export function AdminGate({
           <Logo />
           <p className="mt-2 text-sm text-ink-secondary">Painel de administração</p>
         </div>
-        <form
-          className="mt-6 space-y-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            onSubmit(value);
-          }}
-        >
+        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
           <Input
-            label="Senha de admin"
-            type="password"
+            label="E-mail"
+            type="email"
+            autoComplete="email"
             autoFocus
-            value={value}
-            onChange={(event) => setValue(event.target.value)}
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
           />
-          <Button type="submit" fullWidth disabled={!value}>
+          <Input
+            label="Senha"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+          {error && (
+            <p role="alert" className="text-sm text-danger">
+              {error}
+            </p>
+          )}
+          <Button type="submit" fullWidth loading={verifying} disabled={!email || !password}>
             Entrar
           </Button>
         </form>
