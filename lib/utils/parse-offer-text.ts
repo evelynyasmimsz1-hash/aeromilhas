@@ -34,19 +34,27 @@ function parseBrazilianNumber(raw: string): number {
   return Number(cleaned.replace(/\./g, ""));
 }
 
+// Quando o texto menciona ida e volta separadas ("42 mil de ida e 38 mil de
+// volta"), soma as duas em vez de pegar só a primeira — é o valor total que
+// interessa pra oferta.
 function guessMiles(text: string): number | undefined {
-  const thousandWord = text.match(/(\d+(?:[.,]\d+)?)\s*mil\s*milhas?/i);
-  if (thousandWord) return Math.round(parseBrazilianNumber(thousandWord[1]) * 1000);
+  const thousandWords = [...text.matchAll(/(\d+(?:[.,]\d+)?)\s*mil\s*milhas?/gi)];
+  if (thousandWords.length > 0) {
+    return Math.round(thousandWords.reduce((sum, match) => sum + parseBrazilianNumber(match[1]) * 1000, 0));
+  }
 
-  const direct = text.match(/(\d{1,3}(?:\.\d{3})+|\d{4,6})\s*milhas?/i);
-  if (direct) return Math.round(parseBrazilianNumber(direct[1]));
+  const direct = [...text.matchAll(/(\d{1,3}(?:\.\d{3})+|\d{4,6})\s*milhas?/gi)];
+  if (direct.length > 0) {
+    return Math.round(direct.reduce((sum, match) => sum + parseBrazilianNumber(match[1]), 0));
+  }
 
   return undefined;
 }
 
 function guessTaxes(text: string): number | undefined {
-  const match = text.match(/r\$\s*([\d.,]+)/i);
-  return match ? parseBrazilianNumber(match[1]) : undefined;
+  const matches = [...text.matchAll(/r\$\s*([\d.,]+)/gi)];
+  if (matches.length === 0) return undefined;
+  return matches.reduce((sum, match) => sum + parseBrazilianNumber(match[1]), 0);
 }
 
 function guessProgram(text: string): string | undefined {
