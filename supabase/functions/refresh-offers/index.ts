@@ -21,6 +21,26 @@ const routes: { origin: string; originAirport: string; destination: string; dest
   { origin: "Curitiba", originAirport: "CWB", destination: "Orlando", destinationAirport: "MCO", international: true },
 ];
 
+// Mesmo mapeamento de data/destination-images.ts do app Next.js — duplicado
+// aqui porque essa function roda num runtime Deno separado, sem acesso
+// direto aos módulos do app.
+const destinationImages: Record<string, string> = {
+  Miami: "https://images.unsplash.com/photo-1506966953602-c20cc11f75e3?w=800&q=80",
+  Orlando: "https://images.unsplash.com/photo-1597466599360-3b9775841aec?w=800&q=80",
+  Lisboa: "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=800&q=80",
+  Paris: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80",
+  "Nova York": "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80",
+  "Buenos Aires": "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=800&q=80",
+  Santiago: "https://images.unsplash.com/photo-1595397551216-9f60034a2d68?w=800&q=80",
+  Cancún: "https://images.unsplash.com/photo-1552074284-5e88ef1aef18?w=800&q=80",
+  Madri: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800&q=80",
+  Londres: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80",
+};
+
+function destinationImage(city: string) {
+  return destinationImages[city] ?? destinationImages.Lisboa;
+}
+
 const programs = ["LATAM Pass", "Smiles", "TudoAzul", "TAP Miles&Go", "Iberia Plus"];
 const cabins: CabinClass[] = ["economy", "economy", "economy", "premium_economy", "business"];
 
@@ -61,6 +81,7 @@ function buildOffer() {
     quality,
     international: route.international,
     departure_date: departureDate.toISOString().slice(0, 10),
+    image_url: destinationImage(route.destination),
     source: "auto",
   };
 }

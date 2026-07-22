@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { mockOffers } from "@/data/mock-offers";
+import { destinationImage } from "@/data/destination-images";
 import { resolveFunctionError } from "@/lib/utils/supabase-error";
 import type { CabinClass, FlightOffer, OfferQuality } from "@/types";
 
@@ -76,7 +77,7 @@ function toRow(input: AdminOfferInput) {
     program_name: input.programName,
     cabin: input.cabin,
     quality: input.quality,
-    image_url: input.imageUrl || null,
+    image_url: input.imageUrl || destinationImage(input.destination),
     departure_date: input.departureDate || null,
     international: input.international,
   };
