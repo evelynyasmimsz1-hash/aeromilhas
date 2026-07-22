@@ -5,10 +5,12 @@
 import { createClient } from "npm:@supabase/supabase-js";
 import Stripe from "npm:stripe";
 import { createStripeClient, planFromPriceId } from "../_shared/stripe.ts";
+import { sendMetaPurchaseEvent } from "../_shared/meta-capi.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET")!;
+const appUrl = Deno.env.get("APP_URL");
 
 const stripe = createStripeClient();
 const cryptoProvider = Stripe.createSubtleCryptoProvider();
@@ -78,6 +80,16 @@ Deno.serve(async (request) => {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
+
+      if (session.customer_details?.email) {
+        await sendMetaPurchaseEvent({
+          email: session.customer_details.email,
+          value: (session.amount_total ?? 0) / 100,
+          currency: session.currency ?? "brl",
+          eventId: session.id,
+          eventSourceUrl: appUrl,
+        });
+      }
 
       if (session.mode === "payment") {
         // Vitalício comprado por usuário já autenticado (ex: assinatura
