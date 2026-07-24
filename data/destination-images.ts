@@ -9,6 +9,8 @@ export const destinationImages: Record<string, string> = {
   Cancún: "https://images.unsplash.com/photo-1552074284-5e88ef1aef18?w=800&q=80",
   Madri: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800&q=80",
   Londres: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80",
+  Doha: "https://images.unsplash.com/photo-1685113872064-de4180a0ea93?w=800&q=80",
+  Joanesburgo: "https://images.unsplash.com/photo-1636706519609-988babca3dd5?w=800&q=80",
 };
 
 export function destinationImage(city: string) {

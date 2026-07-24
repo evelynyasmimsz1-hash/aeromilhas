@@ -23,6 +23,8 @@ export const airports: Airport[] = [
   { code: "EZE", city: "Buenos Aires" },
   { code: "SCL", city: "Santiago" },
   { code: "CUN", city: "Cancún" },
+  { code: "DOH", city: "Doha" },
+  { code: "JNB", city: "Joanesburgo" },
 ];
 
 export const destinationOptions = Array.from(
