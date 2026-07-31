@@ -88,8 +88,6 @@ export default function AssinaturaPage() {
   return (
     <AuthShell tagline="Escolha seu plano pra liberar o acesso">
       <form className="space-y-5" onSubmit={onSubmit} noValidate>
-        <PlanSelector plans={displayPlans} selected={selectedPlan} onSelect={setSelectedPlan} />
-
         <div>
           {appliedCoupon ? (
             <p className="text-sm text-success">Cupom {appliedCoupon} aplicado.</p>
@@ -110,6 +108,8 @@ export default function AssinaturaPage() {
             </div>
           )}
         </div>
+
+        <PlanSelector plans={displayPlans} selected={selectedPlan} onSelect={setSelectedPlan} />
 
         {!isAuthenticated && (
           <Input
