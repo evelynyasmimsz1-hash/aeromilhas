@@ -27,11 +27,16 @@ export async function getSubscription(userId: string): Promise<Subscription | nu
   return mapRow(data as SubscriptionRow);
 }
 
-export async function createCheckoutSession(plan: "monthly" | "lifetime", email?: string): Promise<string> {
+export async function createCheckoutSession(
+  plan: "monthly" | "lifetime",
+  email?: string,
+  coupon?: string,
+): Promise<string> {
   if (!supabase) throw new Error("Supabase não está configurado.");
-  const { data, error } = await supabase.functions.invoke("create-checkout-session", {
-    body: email ? { plan, email } : { plan },
-  });
+  const body: Record<string, string> = { plan };
+  if (email) body.email = email;
+  if (coupon) body.coupon = coupon;
+  const { data, error } = await supabase.functions.invoke("create-checkout-session", { body });
   if (error) throw await resolveFunctionError(error);
   return data.url as string;
 }

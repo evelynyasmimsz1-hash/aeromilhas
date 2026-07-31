@@ -10,7 +10,7 @@
 //   vinculada via link-subscription. success_url manda pro /criar-conta com
 //   o id da sessão, pra provar que o pagamento foi feito.
 import { createClient } from "npm:@supabase/supabase-js";
-import { createStripeClient, priceIdFromPlan, corsHeaders } from "../_shared/stripe.ts";
+import { createStripeClient, priceIdFromPlan, isValidCoupon, corsHeaders } from "../_shared/stripe.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -43,10 +43,14 @@ Deno.serve(async (request) => {
       return Response.json({ error: "Plano inválido" }, { status: 400, headers: corsHeaders });
     }
 
-    const priceId = priceIdFromPlan(plan);
+    // O cupom nunca é confiado a partir do que o client mostrou — é
+    // validado aqui de novo, e é essa validação que decide a Price usada.
+    const hasCoupon = isValidCoupon(body?.coupon);
+
+    const priceId = priceIdFromPlan(plan, hasCoupon);
     if (!priceId) {
       return Response.json(
-        { error: `Price ID não configurado para o plano ${plan} (verifique os secrets STRIPE_PRICE_MONTHLY/STRIPE_PRICE_ANNUAL)` },
+        { error: `Price ID não configurado para o plano ${plan} (verifique os secrets de Price no Supabase)` },
         { status: 500, headers: corsHeaders },
       );
     }

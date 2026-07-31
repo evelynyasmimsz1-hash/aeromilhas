@@ -4,7 +4,8 @@ export const pricingPlans: PricingPlan[] = [
   {
     id: "monthly",
     name: "Mensal",
-    price: 19.9,
+    price: 247,
+    couponPrice: 147,
     billingPeriod: "mês",
     features: [
       "Acesso completo à plataforma",
@@ -17,7 +18,8 @@ export const pricingPlans: PricingPlan[] = [
   {
     id: "lifetime",
     name: "Vitalício",
-    price: 197,
+    price: 247,
+    couponPrice: 197,
     billingPeriod: "pagamento único",
     savingsLabel: "Pague uma vez, use para sempre — sem mensalidade",
     badge: "Mais escolhido",

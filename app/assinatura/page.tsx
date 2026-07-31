@@ -18,6 +18,11 @@ import { forgotPasswordSchema, type ForgotPasswordValues } from "@/lib/validatio
 import { pricingPlans } from "@/data/pricing-plans";
 import type { PricingPlan } from "@/types";
 
+// Mesmo código validado de novo no servidor (create-checkout-session) — a
+// checagem aqui é só pra atualizar o preço exibido na hora, não é o que
+// garante o desconto de verdade.
+const VALID_COUPON = "VOUDEMILHAS";
+
 export default function AssinaturaPage() {
   const router = useRouter();
   const isLoading = useAuthStore((state) => state.isLoading);
@@ -27,6 +32,22 @@ export default function AssinaturaPage() {
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan["id"] | null>(onboardingPlan);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
+  const displayPlans = pricingPlans.map((plan) =>
+    appliedCoupon && plan.couponPrice !== undefined ? { ...plan, price: plan.couponPrice } : plan,
+  );
+
+  function applyCoupon() {
+    setCouponError(null);
+    if (couponInput.trim().toUpperCase() === VALID_COUPON) {
+      setAppliedCoupon(VALID_COUPON);
+    } else {
+      setCouponError("Cupom inválido.");
+    }
+  }
 
   const {
     register,
@@ -47,7 +68,7 @@ export default function AssinaturaPage() {
     setFormError(null);
     setSubmitting(true);
     try {
-      const url = await createCheckoutSession(selectedPlan, email);
+      const url = await createCheckoutSession(selectedPlan, email, appliedCoupon ?? undefined);
       window.location.href = url;
     } catch {
       setFormError("Não foi possível iniciar o pagamento. Tente novamente.");
@@ -67,7 +88,28 @@ export default function AssinaturaPage() {
   return (
     <AuthShell tagline="Escolha seu plano pra liberar o acesso">
       <form className="space-y-5" onSubmit={onSubmit} noValidate>
-        <PlanSelector plans={pricingPlans} selected={selectedPlan} onSelect={setSelectedPlan} />
+        <PlanSelector plans={displayPlans} selected={selectedPlan} onSelect={setSelectedPlan} />
+
+        <div>
+          {appliedCoupon ? (
+            <p className="text-sm text-success">Cupom {appliedCoupon} aplicado.</p>
+          ) : (
+            <div className="flex items-end gap-2">
+              <div className="flex-1">
+                <Input
+                  label="Cupom de desconto (opcional)"
+                  placeholder="Ex: VOUDEMILHAS"
+                  value={couponInput}
+                  onChange={(event) => setCouponInput(event.target.value)}
+                  error={couponError ?? undefined}
+                />
+              </div>
+              <Button type="button" variant="secondary" onClick={applyCoupon} disabled={!couponInput.trim()}>
+                Aplicar
+              </Button>
+            </div>
+          )}
+        </div>
 
         {!isAuthenticated && (
           <Input

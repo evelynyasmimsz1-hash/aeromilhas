@@ -114,6 +114,8 @@ export type PricingPlan = {
   id: "monthly" | "lifetime";
   name: string;
   price: number | null;
+  /** preço com cupom de desconto aplicado, quando houver */
+  couponPrice?: number;
   billingPeriod: "mês" | "pagamento único";
   savingsLabel?: string;
   badge?: string;
